@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+
 require("dotenv").config();
 
-const app = express();
+const client = require("./database/client");
 
+const app = express();
 app.use(
   cors({
     origin: "*",
@@ -14,6 +16,7 @@ const catsRouter = require("./Controllers/catsRouter");
 
 // GET, POST, PUT, DELETE
 
+app.use(express.json());
 app.get("/", (request, response) => {
   console.log("Hello World");
   response.send("Hello World");

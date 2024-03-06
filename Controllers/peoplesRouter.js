@@ -1,62 +1,34 @@
 const express = require("express");
 
 const router = express.Router();
-
-const peoples = [
-  {
-    firstname: "Marc",
-    lastname: "Philippe",
-    age: 42,
-    hobbies: ["Foot", "Basket", "Food"],
-    isGraduate: false,
-    adress: {
-      street: "Une rue parmis d'autres",
-      zipcode: 12345,
-      city: "Paris",
-    },
-  },
-  {
-    firstname: "Bob",
-    lastname: "Martin",
-    age: 35,
-    hobbies: ["Guitar", "Books"],
-    isGraduate: true,
-    adress: {
-      street: "Une autre rue parmis d'autres",
-      zipcode: 12345,
-      city: "Paris BIS",
-    },
-  },
-  {
-    firstname: "Pierre",
-    lastname: "Michel",
-    age: 35,
-    hobbies: ["Guitar", "Books"],
-    isGraduate: true,
-    adress: {
-      street: "Une autre rue parmis d'autres",
-      zipcode: 12345,
-      city: "Paris BIS",
-    },
-  },
-  {
-    firstname: "Philippe",
-    lastname: "Zinclair",
-    age: 35,
-    hobbies: ["Guitar", "Books"],
-    isGraduate: false,
-    adress: {
-      street: "Une autre rue parmis d'autres",
-      zipcode: 12345,
-      city: "Paris BIS",
-    },
-  },
-];
+const client = require("../database/client");
 
 // / GET
 router.get("/", (request, response) => {
-  console.log("Hello Peoples");
-  response.status(200).json(peoples);
+  client.all("SELECT * FROM peoples", (err, peoples) => {
+    response.status(200).json(peoples);
+  });
+});
+
+router.post("/", (request, response) => {
+  console.log("POST people");
+  console.log(request.body);
+  const query = client.prepare(
+    "INSERT INTO peoples (firstname, lastname, age, isGraduate, adress_street, adress_zipcode, adress_city, hobbies_0, hobbies_1, hobbies_2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  );
+  query.run([
+    request.body.firstname,
+    request.body.lastname,
+    request.body.age,
+    request.body.isGraduate,
+    request.body.adress_street,
+    request.body.adress_zipcode,
+    request.body.adress_city,
+    request.body.hobbies_0,
+    request.body.hobbies_1,
+    request.body.hobbies_2,
+  ]);
+  response.sendStatus(201);
 });
 
 module.exports = router;
